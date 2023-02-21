@@ -1,0 +1,323 @@
+//////////////////////////////////||\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+//|----------------------------------------------------------------|\\
+//|   /-------------/ |------------------| |---|    |---|    |---| |\\
+//|  /             /  |                  | |   |    |   |    |   | |\\
+//| |   |---------/   |------|    |------| |   |    |   |    |   | |\\
+//|  \   \                   |    |        |   |    |   |    |   | |\\
+//|    \   \                 |    |        |   |    |   |    |   | |\\
+//|      \   \               |    |        |   |    |   |    |   | |\\
+//|        \   \             |    |        |   |    |   |    |   | |\\
+//|          \   \           |    |        |   |    |   |    |   | |\\
+//| 	       \   \         |    |         \   \   |   |   /   /  |\\
+//|   /---------|  |         |    |          \   |--|   |--|   /   |\\
+//|  /            /          |    |           \               /    |\\
+//| /------------/           |----|            \-------------/     |\\
+//|----------------------------------------------------------------|\\
+//|                         OS Version: 1                          |\\
+//|                               By                               |\\
+//|                   Lt. Jamergaman BLID: 23108                   |\\
+//|           Do not modify or (re)distribute this file!           |\\
+//|                     © 2010 Lt. Jamergaman.                     |\\
+//|----------------------------------------------------------------|\\
+//////////////////////////////////||\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+
+//VERSION
+$STW::Gamemode::OS::Version = "1";
+STWOS.version = $STW::OS::Version;
+warn("STW Operation System version: "@$STW::Gamemode::OS::Version);
+
+new ScriptObject("STWOS")
+{
+	name = $STW::Gamemode::OS::Name;
+	shortName = $STW::Gamemode::OS::ShortName;
+	startMessage = $STW::Gamemode::OS::StartMessage;
+	isSTWOS = 1;
+	filepath = $STW::Gamemode::OS::Filepath;
+	defaultOS = $STW::Gamemode::OS::DefaultOS;
+	isAdmin = 1;
+	isSuperAdmin = 1;
+	bl_id = 123456;
+};
+
+//PRE-MADE OS FUNCTIONS
+function STWOS::sendMessage(%this,%message)
+{
+	serverCmdMessageSent(%this,%message);
+}
+
+function STWOS::sendClientMessage(%this,%user,%message)
+{
+	if(isObject(%user))
+	{
+		messageClient(%user,'',%this.startMessage@%message);
+	}
+}
+
+//CLIENT VAR MANIPULATION [BEGIN]
+function STWOS::getPlayerID(%this,%player,%client)
+{
+    if(%player $= "") //want to make sure that there won't be errors
+    {
+        return;
+    }
+    if(!isObject(%player) || !isObject(%client)) //want to make sure that there won't be errors
+    {
+        return;
+    }
+    if(%client $= "") //%client will be used for something later on
+    {
+        %client = %player.client;
+    }
+
+    return %player;
+}
+//CLIENT VAR MANIPULATION [END]
+
+//ITEM MANIPULATION [BEGIN]
+function STWOS::listAllItems(%this)
+{
+	//return weapon list
+}
+
+function STWOS::findItemValue(%this,%weaponData)
+{
+    return %weaponData.Value;
+}
+//ITEM MANIPULATION [END]
+
+//USER STATISTIC MANIPULATION [BEGIN]
+function STWOS::getUserStats(%this,%client)
+{
+	%level = %client.STW_Level;
+	%rank = %client.STW_Rank;
+	%exp = %client.STW_EXP;
+	%reqexp = %client.STW_ReqEXP;
+	%cps = %client.STW_CPs;
+	%money = %client.STW_Money;
+	%kills = %client.getKills();
+	%deaths = %client.getDeaths();
+	%id = %client.STW_ID;
+
+	return "Level "@%level@" Rank "@%rank@" EXP "@%exp@" Req. EXP "@%reqexp@" CPs "@%cps@" Money "@%money@" Kills "@%kills@" Deaths "@%deaths@" ID "@%id;
+}
+
+function STWOS::resetUserStats(%this,%client)
+{
+	%client.STW_Level = 1;
+	%client.STW_Rank = 0;
+	%client.STW_EXP = 0;
+	%client.STW_ReqEXP = %client.STW_Level * 50 * %client.STW_Level * 5;
+	%client.STW_CPs = 0;
+	%client.setKills(0);
+	%client.setDeaths(0);
+	for(%i = 1; %i <= $STW::Gamemode::InventorySystem::MaxInventorySlots; %i++)
+	{
+		%client.STW_InventorySlot[%i] = "Empty";
+	}
+
+	%client.STW_ResetTools();
+}
+
+function STWOS::addToUserEXP(%this,%client,%amount)
+{
+	if(%client.STW_EXP < %client.STW_ReqEXP)
+    	{
+		if(%amount > 0 || %amount < 0)
+		{
+       			%client.STW_EXP += %amount;
+        		if(%client.STW_EXP >= %client.STW_ReqEXP)
+        		{
+            			if(%client.STW_Level < $STW::Gamemode::Leveling::MaxLevel)
+            			{
+                			%client.STW_Level++;
+                			%client.STW_EXP = 0;
+                			%client.STW_ReqEXP = %client.STW_Level * 50 * %client.STW_Level * 5;
+                			%client.chatMessage("<font:arial black:20>\c2You have leveled up! (\c6"@%client.STW_Level@"\c2)");
+                			messageAll('',"\c6"@%client.name@" \c2has leveled up! (\c6"@%client.STW_Level@"\c2)");
+            			}
+			}
+        	}
+    	}
+   	else if(%client.STW_Level < $STW::Gamemode::Leveling::MaxLevel)
+    	{
+        	%client.STW_Level++;
+        	%client.STW_EXP = 0;
+        	%client.STW_ReqEXP = %client.STW_Level * 50 * %client.STW_Level * 5;
+    	}
+	
+	%client.STW_TotalEXP += %amount;
+}
+
+function STWOS::addToUserMoney(%this,%client,%amount)
+{
+	if(%amount > 0 || %amount < 0)
+	{
+		%client.STW_Money += %amount;
+	}
+}
+
+function STWOS::addToUserLevel(%this,%client,%amount)
+{
+	if(%amount > 0 || %amount < 0)
+	{
+		%client.STW_Level += %amount;
+	}
+}
+
+function STWOS::addToUserCP(%this,%client,%amount)
+{
+	if(%amount > 0 || %amount < 0)
+	{
+		%client.STW_CPs += %amount;
+	}
+}
+//USER STATISTIC MANIPULATION [END]
+
+//WARNING SYSTEM [BEGIN]
+function STWOS::WarnUser(%this,%client,%message)
+{
+	commandToClient(%client,'STW_OKDlgNotify',"STWOS Warning",%message);
+	error("STWOS +- Warning \c6"@%client.name@" \c2- Message: \c6"@%message);
+	%client.STW_Warnings++;
+	if(%client.STW_Warnings >= 3)
+	{
+		STWOS.TakeUserAction(%client,%message);
+	}
+}
+
+function STWOS::TakeUserAction(%this,%client,%reason)
+{
+	if(%client.STW_Warnings == 3)
+	{
+		//%client.delete("STW[OS]: Has kicked you. (warnings given: 3)");
+		messageAll('MsgAdminForce',"\c3"@STWOS.name@" \c2has kicked \c3"@%client.name@" \c2(BLID: "@%client.bl_id@") - \"\c3"@%reason@"\c2\"");
+	}
+	if(%client.STW_Warnings >= 6)
+	{
+		%banBot = new AIClient()
+		{
+			name = "STWOS";
+			netName = "STWOS";
+			LANName = "STWOS";
+			bl_id = STWOS.bl_id;
+			connected = 1;
+			isAdmin = 1;
+		};
+
+		banBLID(%banBot,%client,%client.bl_id,15,%reason);
+		
+		%banbot.delete();
+		
+	}
+}
+//WARNING SYSTEM [END]
+
+//BUILD CYCLE [BEGIN]
+//VARS
+$STW::Gamemode::BuildCycle::LoadTime = "15"; //default is 15
+
+function STWOS::registerBuild(%this,%source)
+{
+    $STW::Gamemode::BuildCycle::SaveCount++;
+    fileCopy(%source,"config/server/Snow Trench Wars/Builds/save["@$STW::Gamemode::BuildCycle::SaveCount@"].bls");
+}
+
+function STWOS::cycleBuild(%this,%source) //cycles between build saves
+{
+    %buildAI = new AIClient()
+    {
+        name = "Build AI";
+        bl_id = -1;
+        netName = "Build AI";
+        connected = 1;
+        isAdmin = 1;
+    };
+	
+    serverCmdClearAllBricks(%buildAI);
+    $LoadingBricks_BrickGroup = "brickGroup_23108";
+    $LoadingBricks_OwnerShip = 0;
+    STWOS.sendMessage("Commencing Save File Load in "@$STW::Gamemode::BuildCycle::LoadTime@" seconds.");
+    schedule($STW::Gamemode::BuildCycle::LoadTime*10000,0,"serverDirectSaveFileLoad",%source,3,0,0);
+}
+
+function STWOS::resetBuild(%this)
+{
+}
+
+function STWOS::nextBuild(%this)
+{
+}
+
+function STWOS::clearBuild(%this)
+{
+}
+//BUILD CYCLE [END]
+
+//CO-HOST [BEGIN]
+function STWOS::setCoHost(%this,%blid,%name)
+{
+	if(%blid $= "")
+	{
+		return;
+	}
+	if(%name !$= "")
+	{
+		for(%i = 0; %i < ClientGroup.getCount(); %i++)
+		{
+			%client = ClientGroup.getObject(%i);
+
+			if(%client.bl_id == %blid)
+			{
+				serverCmdSTW_makeCoHost(%this,%client);
+				$STW::Gamemode::CoHostName = %client.name;
+			}
+		}
+	}
+	else
+	{
+		%name = "NULL";
+	}
+	
+	$STW::Gamemode::CoHostBLID = %blid;
+	echo("\c2STWOS-:-STWOS.setcoHost Usage:: self object, BL_ID, victim name - blid is "@%blid@" and name is "@%name);
+}
+
+function serverCmdSTW_makeCoHost(%client,%user)
+{
+	if(%client.isSTWOS)
+	{
+		echo("\c2STWOS-:-STW_MakeCoHost Usage:: client object, victim object - STWOS as client object");
+	}
+	if(isObject(%user))
+	{
+		%user = %user.name;
+	}
+	if(isObject(findclientbyname(%user)))
+	{
+		%user = findclientbyname(%user);
+		%userName = %user.name;
+		%clientName = %client.name;
+
+		%user.isAdmin = 1;
+		%user.isSuperAdmin = 1;
+		%user.isCoHost = 1;
+		%user.sendPlayerListUpdate();
+		
+		if(%user.bl_id == $STW::Gamemode::CoHostBLID)
+		{
+			messageAll('MsgAdminForce',"\c2"@%userName@" has become Super Admin (Co-Host, Auto) - "@%clientName);
+		}
+		else
+		{
+			messageAll('MsgAdminForce',"\c2"@%userName@" has become Super Admin (Co-Host, Manual)");
+		}
+	}
+	
+	STW_SavePrefs();
+}
+
+//end
+
+function STWOS::logAction(%this,%user,%check,%type,%other,%other2,%other3)
+{
+}

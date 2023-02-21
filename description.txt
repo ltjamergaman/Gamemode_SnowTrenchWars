@@ -1,0 +1,25 @@
+Lt. Jamergaman's Snow Trench Wars!
+
+<sPush><font:courier new:8>|----------------------------------------------------------------|
+|   /-------------/ |------------------| |---|    |---|    |---| |
+|  /             /  |                  | |   |    |   |    |   | |
+| |   |---------/   |------|    |------| |   |    |   |    |   | |
+|  \   \                   |    |        |   |    |   |    |   | |
+|    \   \                 |    |        |   |    |   |    |   | |
+|      \   \               |    |        |   |    |   |    |   | |
+|        \   \             |    |        |   |    |   |    |   | |
+|          \   \           |    |        |   |    |   |    |   | |
+|            \   \         |    |         \   \   |   |   /   /  |
+|   /---------|  |         |    |          \   |--|   |--|   /   |
+|  /            /          |    |           \               /    |
+| /------------/           |----|            \-------------/     |
+|----------------------------------------------------------------|
+|                          <font:courier new:13>Version: 6<font:courier new:8>                          |
+|                               <font:courier new:13>By<font:courier new:8>                               |
+|                <font:courier new:13>Lt. Jamergaman BLID: 23108<font:courier new:8>                 |
+|       <font:courier new:13>Do not modify or (re)distribute this add-on!<font:courier new:8>    |
+|                   <font:courier new:13>© 2010 Lt. Jamergaman.<font:courier new:8>                   |
+|----------------------------------------------------------------|<sPop>
+<just:right><font:verdona:1>
+Title: Lt. Jamergaman's Snow Trench Wars Mod
+Author: Lt. Jamergaman

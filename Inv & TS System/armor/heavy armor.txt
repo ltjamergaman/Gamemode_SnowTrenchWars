@@ -1,0 +1,4 @@
+armorHeavy
+5000
+50
+Heavy Armor

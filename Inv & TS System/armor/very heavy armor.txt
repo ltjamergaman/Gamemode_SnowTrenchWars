@@ -1,0 +1,4 @@
+armorVeryHeavy
+10000
+100
+Very Heavy Armor

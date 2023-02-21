@@ -1,0 +1,4 @@
+armorMedium
+2500
+25
+Medium Armor

@@ -1,0 +1,4 @@
+armorMax
+20000
+200
+Max Armor

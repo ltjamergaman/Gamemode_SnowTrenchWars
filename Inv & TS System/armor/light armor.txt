@@ -1,0 +1,4 @@
+armorLight
+1000
+10
+Light Armor
